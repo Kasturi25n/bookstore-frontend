@@ -2,25 +2,36 @@
 
 import { useState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
+import { supabase } from "../lib/supabase";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
       alert("Please fill all fields");
       return;
     }
 
-    if (!email.includes("@")) {
-      alert("Enter a valid email");
+    const { data, error } = await supabase
+      .from("user")
+      .select("*")
+      .eq("email", email)
+      .eq("password", password);
+
+    if (error) {
+      alert("Login Failed");
+      console.log(error.message);
       return;
     }
 
-    localStorage.setItem("isLoggedIn", "true");
-
-    alert("Login Successful");
+    if (data.length > 0) {
+      localStorage.setItem("isLoggedIn", "true");
+      alert("Login Successful");
+    } else {
+      alert("Invalid Email or Password");
+    }
   };
 
   return (
@@ -58,6 +69,7 @@ export default function LoginPage() {
           <GoogleLogin
             onSuccess={(credentialResponse) => {
               console.log(credentialResponse);
+              localStorage.setItem("isLoggedIn", "true");
               alert("Google Login Successful");
             }}
             onError={() => {
