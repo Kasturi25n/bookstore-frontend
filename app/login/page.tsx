@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { GoogleLogin } from "@react-oauth/google";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -17,13 +18,15 @@ export default function LoginPage() {
       return;
     }
 
+    localStorage.setItem("isLoggedIn", "true");
+
     alert("Login Successful");
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
       <div className="bg-white shadow-lg rounded-2xl p-8 w-[400px] transition-all duration-300">
-        
+
         <h1 className="text-3xl font-bold text-center mb-6 text-black">
           Book Store Login
         </h1>
@@ -50,6 +53,19 @@ export default function LoginPage() {
         >
           Login
         </button>
+
+        <div className="mt-4 flex justify-center">
+          <GoogleLogin
+            onSuccess={(credentialResponse) => {
+              console.log(credentialResponse);
+              alert("Google Login Successful");
+            }}
+            onError={() => {
+              alert("Google Login Failed");
+            }}
+          />
+        </div>
+
       </div>
     </div>
   );
